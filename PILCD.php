@@ -28,7 +28,7 @@ define('E_PULSE',0.00005);
 define('E_DELAY',0.00005);
 
 class PiLCD {
-  function __construct()
+	function __construct()
 	{
 		$this->GPIO = new GPIO;
 
@@ -52,7 +52,7 @@ class PiLCD {
 		$this->byte(0x01,LCD_CMD);
 	}
 
-	function string($message,$style)
+	function string($message,$style=0)
 	{
 		switch($style)
 		{
@@ -71,6 +71,38 @@ class PiLCD {
 		{
 			$this->byte(ord(substr($message,$i,1)),LCD_CHR);
 		}
+	}
+
+	function string_with_position($message,$line,$cursor)
+	{
+		$this->set_line($line);
+		$this->set_cursor($cursor);
+		for($i=0;$i<strlen($message);$i++)
+		{
+			$this->byte(ord(substr($message,$i,1)),LCD_CHR);
+		}
+	}
+
+	function set_line($line)
+	{
+	switch($line)
+	{
+		case 1:
+		$this->byte(LCD_LINE_1,LCD_CMD);
+		break;
+		case 2:
+		$this->byte(LCD_LINE_2,LCD_CMD);
+		break;
+	}  
+	}
+
+	function set_cursor($cursor)
+	{
+		$i=0;
+		while($i<$cursor) {
+		$this->byte(0x14,LCD_CMD);
+		$i++;
+	}
 	}
 
 	function byte($bits,$mode)
@@ -132,6 +164,22 @@ class PiLCD {
 			$this->GPIO->output($data_line,0);
 		}		
 	}
+
+	function clear_display()
+	{
+		$this->byte(0x01,LCD_CMD);
+	}
+
+	function home()
+	{
+		$this->byte(LCD_LINE_1,LCD_CMD);
+	}
+
+	function char($char)
+	{
+		$this->byte(ord($char),LCD_CHR);		
+	}
+
 }
 
 ?>
